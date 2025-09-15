@@ -1,0 +1,179 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Manager - Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2 id="title">Manager</h2>
+      <div>
+        <span id="userInfo"></span>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </div>
+    <div class="card dashboard">
+      <div class="card small">
+        <h3>Mark Attendance</h3>
+        <select id="status">
+          <option value="present">Present</option>
+          <option value="absent">Absent</option>
+          <option value="remote">Remote</option>
+          <option value="half-day">Half-day</option>
+        </select>
+        <input id="note" placeholder="Note (optional)" />
+        <button id="markBtn">Mark</button>
+        <p class="small-muted">You can mark your own attendance or (Project Manager) mark for others from manager panel.</p>
+      </div>
+      <div class="card small">
+        <h3>Your Attendance</h3>
+        <table class="table" id="attTable">
+          <thead><tr><th>Date</th><th>Status</th><th>Note</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card small" id="usersCard">
+        <h3>Team / All Users</h3>
+        <button id="refreshUsers">Refresh Users</button>
+        <table class="table" id="usersTable">
+          <thead><tr><th>Name</th><th>Role</th><th>Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Manager admin area -->
+    <div class="card" id="managerCard" style="display:none;">
+      <h3>Project Manager - Admin Panel</h3>
+      <button id="refreshAllAttend">Refresh All Attendance</button>
+      <table class="table" id="allAttTable">
+        <thead><tr><th>User</th><th>Date</th><th>Status</th><th>Note</th><th>Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h4>Create User</h4>
+      <input id="m_name" placeholder="name (unique)" />
+      <input id="m_password" placeholder="password" />
+      <select id="m_role">
+        <option>Project Manager</option><option>Team Leader</option><option>Frontend Developer</option><option>Backend Developer</option><option>HR Manager</option><option>Intern</option><option>CTO</option><option>COO</option><option>Manager</option>
+      </select>
+      <button id="createUserBtn">Create User</button>
+    </div>
+
+    <div class="footer">Office Attendance Demo - role dashboard</div>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const userId = params.get('userId');
+    const name = params.get('name');
+    const role = params.get('role');
+    const token = localStorage.getItem('token');
+    document.getElementById('userInfo').textContent = name + ' ('+ role +')';
+    document.getElementById('title').textContent = role + ' Dashboard';
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{ localStorage.removeItem('token'); location.href='/'; });
+
+    async function api(path, method='GET', data=null){
+      const opts = { method, headers: {} };
+      if(data){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(data); }
+      if(token) opts.headers['Authorization'] = 'Bearer ' + token;
+      const res = await fetch('/api' + path, opts);
+      return res.json();
+    }
+
+    async function loadAttendance(){
+      if(!userId) return;
+      const res = await api('/attendance/'+userId);
+      const tbody = document.querySelector('#attTable tbody');
+      tbody.innerHTML='';
+      if(res.entries){
+        res.entries.forEach(e=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${new Date(e.createdAt).toLocaleString()}</td><td>${e.status}</td><td>${e.note||''}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+    async function loadUsers(){
+      const res = await api('/users');
+      const tbody = document.querySelector('#usersTable tbody');
+      tbody.innerHTML='';
+      if(res.users){
+        res.users.forEach(u=>{
+          const tr = document.createElement('tr');
+          let action = '';
+          if(role === 'Project Manager') action = `<button data-id="${u._id}" class="delUser">Delete</button>`;
+          tr.innerHTML = `<td>${u.name}</td><td>${u.role}</td><td>${action}</td>`;
+          tbody.appendChild(tr);
+        });
+        // attach delete handlers
+        document.querySelectorAll('.delUser').forEach(b=> b.addEventListener('click', async (ev)=>{
+          const id = ev.target.dataset.id;
+          if(!confirm('Delete user and their attendance?')) return;
+          const r = await api('/users/'+id,'DELETE');
+          alert(r.error || 'Deleted');
+          loadUsers();
+        }));
+      }
+    }
+
+    document.getElementById('markBtn').addEventListener('click', async ()=>{
+      const status = document.getElementById('status').value;
+      const note = document.getElementById('note').value;
+      if(!userId){ alert('missing user id'); return; }
+      const res = await api('/attendance','POST',{ userId, status, note });
+      if(res.attendance){ alert('Attendance marked'); loadAttendance(); }
+      else alert(res.error || 'Error');
+    });
+
+    document.getElementById('refreshUsers').addEventListener('click', loadUsers);
+
+    // Manager: show admin panel and load all attendance
+    async function loadAllAttendance(){
+      const res = await api('/all-attendance');
+      const tbody = document.querySelector('#allAttTable tbody');
+      tbody.innerHTML='';
+      if(res.entries){
+        res.entries.forEach(e=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${e.user ? e.user.name : '—'}</td><td>${new Date(e.createdAt).toLocaleString()}</td><td>${e.status}</td><td>${e.note||''}</td><td>${'<button data-id="'+e._id+'" class="delAtt">Delete</button>'}</td>`;
+          tbody.appendChild(tr);
+        });
+        document.querySelectorAll('.delAtt').forEach(b=> b.addEventListener('click', async (ev)=>{
+          const id = ev.target.dataset.id;
+          if(!confirm('Delete attendance?')) return;
+          const r = await api('/attendance/'+id,'DELETE');
+          alert(r.error || 'Deleted');
+          loadAllAttendance();
+        }));
+      }
+    }
+
+    document.getElementById('refreshAllAttend')?.addEventListener('click', loadAllAttendance);
+
+    // Manager create user
+    document.getElementById('createUserBtn')?.addEventListener('click', async ()=>{
+      const name = document.getElementById('m_name').value.trim();
+      const password = document.getElementById('m_password').value;
+      const roleSel = document.getElementById('m_role').value;
+      if(!name||!password||!roleSel) return alert('fill details');
+      const r = await api('/users','POST',{ name, role: roleSel, password });
+      if(r.error) return alert(r.error);
+      alert('User created');
+      loadUsers();
+    });
+
+    // initial loads
+    loadAttendance();
+    // only call users if token present (auth required)
+    loadUsers();
+
+    // show manager panel if role is Project Manager
+    if(role === 'Project Manager'){
+      document.getElementById('managerCard').style.display = 'block';
+      loadAllAttendance();
+    }
+  </script>
+</body>
+</html>
