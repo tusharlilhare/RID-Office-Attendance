@@ -3,16 +3,16 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Office Attendance - Welcome</title>
+  <title>RID Bhart Coaching - Welcome</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Office Attendance</h1>
+    <h1>RID Bhart Coaching & Office Attendance</h1>
 
     <div class="card login-card" id="signupCard">
       <h3>Sign up (create account)</h3>
-      <input id="su_name" placeholder="Your unique name (id)" />
+      <input id="su_name" placeholder="Unique username" />
       <select id="su_role">
         <option value="">-- Select role --</option>
         <option>Project Manager</option>
@@ -24,18 +24,31 @@
         <option>CTO</option>
         <option>COO</option>
         <option>Manager</option>
+        <option>Student</option>
       </select>
+      <input id="su_email" placeholder="Email (optional)" />
+      <input id="su_phone" placeholder="Mobile number (optional)" />
       <input id="su_password" type="password" placeholder="Password (min 6 chars)" />
+      <textarea id="su_bio" placeholder="Short bio (optional)"></textarea>
       <button id="signupBtn">Sign up</button>
       <p class="note">After sign-up you'll be automatically logged in and taken to your dashboard.</p>
     </div>
 
-    <div class="card login-card" id="loginCard" style="display:none;">
+    <div class="card login-card" id="loginCard">
       <h3>Login</h3>
-      <input id="name" placeholder="Your name / id" />
+      <input id="name" placeholder="Your username" />
       <input id="password" type="password" placeholder="Password" />
       <button id="loginBtn">Login / Open Dashboard</button>
       <p class="note">If you already signed up, use login. Otherwise register above.</p>
+      <p><a href="#" id="forgotLink">Forgot password?</a></p>
+    </div>
+
+    <div class="card" id="forgotCard" style="display:none;">
+      <h3>Forgot password</h3>
+      <input id="fp_name" placeholder="Username or email" />
+      <button id="fpBtn">Generate reset token (demo)</button>
+      <p class="note">Demo returns token on screen — in production you'd receive an email.</p>
+      <div id="fpResult"></div>
     </div>
 
   </div>

@@ -1,27 +1,28 @@
 
-async function api(path, method='GET', data=null, token=null){
+async function api(path, method='GET', data=null, token=null, isForm=false){
   const opts = { method, headers: {} };
-  if(data){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(data); }
+  if(!isForm && data){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(data); }
+  if(data && isForm) opts.body = data;
   if(token) opts.headers['Authorization'] = 'Bearer ' + token;
   const res = await fetch('/api' + path, opts);
   return res.json();
 }
 
-// Show login after first successful signup (per request)
 document.getElementById('signupBtn').addEventListener('click', async ()=>{
   const name = document.getElementById('su_name').value.trim();
   const role = document.getElementById('su_role').value;
+  const email = document.getElementById('su_email').value.trim();
+  const phone = document.getElementById('su_phone').value.trim();
   const password = document.getElementById('su_password').value;
-  if(!name || !role || !password){ alert('Please fill name, role and password'); return; }
+  const bio = document.getElementById('su_bio').value.trim();
+  if(!name || !role || !password){ alert('Please fill username, role and password'); return; }
   if(password.length < 6){ alert('Password should be 6+ chars'); return; }
-  const resp = await api('/signup','POST',{ name, role, password });
+  const resp = await api('/signup','POST',{ name, role, password, email, phone, bio });
   if(resp.error) return alert(resp.error);
-  // store token and redirect to dashboard
   localStorage.setItem('token', resp.token);
   const user = resp.user;
   const slug = user.role.toLowerCase().replace(/\s+/g,'-');
-  const url = `/roles/${slug}.html?userId=${user._id}&name=${encodeURIComponent(user.name)}&role=${encodeURIComponent(user.role)}`;
-  window.location.href = url;
+  location.href = `/roles/${slug}.html?userId=${user._id}&name=${encodeURIComponent(user.name)}&role=${encodeURIComponent(user.role)}`;
 });
 
 document.getElementById('loginBtn').addEventListener('click', async ()=>{
@@ -33,20 +34,18 @@ document.getElementById('loginBtn').addEventListener('click', async ()=>{
   localStorage.setItem('token', resp.token);
   const user = resp.user;
   const slug = user.role.toLowerCase().replace(/\s+/g,'-');
-  const url = `/roles/${slug}.html?userId=${user._id}&name=${encodeURIComponent(user.name)}&role=${encodeURIComponent(user.role)}`;
-  window.location.href = url;
+  location.href = `/roles/${slug}.html?userId=${user._id}&name=${encodeURIComponent(user.name)}&role=${encodeURIComponent(user.role)}`;
 });
 
-// If previously signed up and have token, show login card so they can login (or can auto-login if token present)
-window.addEventListener('load', ()=>{
-  const t = localStorage.getItem('token');
-  if(!t){
-    // show signup & login both (signup visible, login hidden until signup success per previous flow).
-    document.getElementById('signupCard').style.display = 'block';
-    document.getElementById('loginCard').style.display = 'block';
-  } else {
-    // token exists - user may be logged in already; keep both visible
-    document.getElementById('signupCard').style.display = 'block';
-    document.getElementById('loginCard').style.display = 'block';
-  }
+document.getElementById('forgotLink').addEventListener('click', ()=>{
+  document.getElementById('forgotCard').style.display = 'block';
+  window.scrollTo(0,1000);
+});
+
+document.getElementById('fpBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('fp_name').value.trim();
+  if(!name) return alert('Enter username or email');
+  const resp = await api('/forgot-password','POST',{ name });
+  if(resp.error) return alert(resp.error);
+  document.getElementById('fpResult').innerHTML = 'Reset token (demo): <b>' + resp.token + '</b><br/>Use it with /reset-password endpoint.';
 });
