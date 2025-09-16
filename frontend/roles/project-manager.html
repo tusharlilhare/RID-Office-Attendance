@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -18,6 +17,7 @@
     </div>
 
     <div class="card dashboard">
+      <!-- Profile Section -->
       <div class="card small">
         <h3>Profile</h3>
         <div id="profileBox"></div>
@@ -30,6 +30,7 @@
         <button id="saveProfile">Save Profile</button>
       </div>
 
+      <!-- Attendance Section -->
       <div class="card small">
         <h3>Mark Attendance</h3>
         <select id="status">
@@ -40,8 +41,14 @@
         </select>
         <input id="note" placeholder="Note (optional)" />
         <button id="markBtn">Mark</button>
+        <h4>My Attendance</h4>
+        <table class="table" id="attTable">
+          <thead><tr><th>Date</th><th>Status</th><th>Note</th></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
 
+      <!-- Users Section -->
       <div class="card small" id="usersCard">
         <h3>Team / All Users</h3>
         <button id="refreshUsers">Refresh Users</button>
@@ -52,6 +59,7 @@
       </div>
     </div>
 
+    <!-- Manager Panel -->
     <div class="card" id="managerCard" style="display:none;">
       <h3>Project Manager - Admin Panel</h3>
       <button id="refreshAllAttend">Refresh All Attendance</button>
@@ -65,11 +73,16 @@
       <input id="m_phone" placeholder="phone" />
       <input id="m_password" placeholder="password" />
       <select id="m_role">
-        <option>Project Manager</option><option>Team Leader</option><option>Frontend Developer</option><option>Backend Developer</option><option>HR Manager</option><option>Intern</option><option>CTO</option><option>COO</option><option>Manager</option><option>Student</option>
+        <option>Project Manager</option><option>Team Leader</option>
+        <option>Frontend Developer</option><option>Backend Developer</option>
+        <option>HR Manager</option><option>Intern</option>
+        <option>CTO</option><option>COO</option>
+        <option>Manager</option><option>Student</option>
       </select>
       <button id="createUserBtn">Create User</button>
     </div>
 
+    <!-- Student Panel -->
     <div class="card" id="studentCard" style="display:none;">
       <h3>Coaching Courses (Students)</h3>
       <div id="courses"></div>
@@ -84,31 +97,42 @@
     const name = params.get('name');
     const role = params.get('role');
     const token = localStorage.getItem('token');
+
     document.getElementById('userInfo').textContent = name + ' ('+ role +')';
     document.getElementById('title').textContent = role + ' Dashboard';
-    document.getElementById('logoutBtn').addEventListener('click', ()=>{ localStorage.removeItem('token'); location.href='/'; });
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{ 
+      localStorage.removeItem('token'); location.href='/'; 
+    });
 
     async function api(path, method='GET', data=null, isForm=false){
       const opts = { method, headers: {} };
       if(!isForm && data){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(data); }
-      if(data && isForm) opts.body = data;
+      if(isForm && data) opts.body = data;
       if(token) opts.headers['Authorization'] = 'Bearer ' + token;
       const res = await fetch('/api' + path, opts);
       return res.json();
     }
 
+    // Load Profile
     async function loadProfile(){
       const r = await api('/profile','GET');
       if(r.user){
-        document.getElementById('profileBox').innerHTML = '<b>'+r.user.name+'</b><br/>' + (r.user.email||'') + '<br/>' + (r.user.phone||'') + '<p>'+ (r.user.bio||'') +'</p>';
+        document.getElementById('profileBox').innerHTML = '<b>'+r.user.name+'</b><br/>' + 
+          (r.user.email||'') + '<br/>' + (r.user.phone||'') + '<p>'+ (r.user.bio||'') +'</p>';
         document.getElementById('p_name').value = r.user.name || '';
         document.getElementById('p_email').value = r.user.email || '';
         document.getElementById('p_phone').value = r.user.phone || '';
         document.getElementById('p_bio').value = r.user.bio || '';
-        if(r.user.avatar) { document.getElementById('avatarImg').src = r.user.avatar; document.getElementById('avatarImg').style.display='inline-block'; }
+        if(r.user.avatar){ 
+          document.getElementById('avatarImg').src = r.user.avatar; 
+          document.getElementById('avatarImg').style.display='inline-block'; 
+        } else {
+          document.getElementById('avatarImg').src = '../uploads/default-avatar.png';
+        }
       }
     }
 
+    // Save Profile
     document.getElementById('saveProfile').addEventListener('click', async ()=>{
       const name = document.getElementById('p_name').value.trim();
       const email = document.getElementById('p_email').value.trim();
@@ -116,18 +140,20 @@
       const bio = document.getElementById('p_bio').value.trim();
       const r = await api('/profile','PUT',{ name, email, phone, bio });
       if(r.error) return alert(r.error);
+
       const file = document.getElementById('p_avatar').files[0];
       if(file){
         const fd = new FormData();
         fd.append('avatar', file);
-        const up = await api('/upload-avatar','POST', fd, null, true);
-        if(up.error) alert(up.error); else alert('Profile updated');
+        const up = await api('/upload-avatar','POST', fd, true);
+        if(up.error) alert(up.error); else alert('Profile updated with avatar');
       } else {
         alert('Profile updated');
       }
       loadProfile();
     });
 
+    // Attendance
     async function loadAttendance(){
       if(!userId) return;
       const res = await api('/attendance/'+userId);
@@ -152,6 +178,7 @@
       else alert(res.error || 'Error');
     });
 
+    // Users
     async function loadUsers(){
       const res = await api('/users');
       const tbody = document.querySelector('#usersTable tbody');
@@ -174,6 +201,7 @@
       }
     }
 
+    // All Attendance (Manager)
     async function loadAllAttendance(){
       const res = await api('/all-attendance');
       const tbody = document.querySelector('#allAttTable tbody');
@@ -197,6 +225,7 @@
     document.getElementById('refreshUsers').addEventListener('click', loadUsers);
     document.getElementById('refreshAllAttend')?.addEventListener('click', loadAllAttendance);
 
+    // Create User
     document.getElementById('createUserBtn')?.addEventListener('click', async ()=>{
       const name = document.getElementById('m_name').value.trim();
       const email = document.getElementById('m_email').value.trim();
@@ -210,6 +239,7 @@
       loadUsers();
     });
 
+    // Load Courses (Student)
     async function loadCourses(){
       const r = await api('/coaching/courses');
       const box = document.getElementById('courses');
@@ -217,17 +247,19 @@
       if(r.courses){
         r.courses.forEach(c=>{
           const d = document.createElement('div');
+          d.classList.add("courseBox");
           d.innerHTML = '<h4>'+c.title+'</h4><p>'+c.description+'</p>';
           box.appendChild(d);
         });
       }
     }
 
+    // Initial Load
     loadProfile();
     loadAttendance();
     loadUsers();
-    if(role === 'Project Manager') { document.getElementById('managerCard').style.display='block'; loadAllAttendance(); }
-    if(role === 'Student') { document.getElementById('studentCard').style.display='block'; loadCourses(); }
+    if(role === 'Project Manager'){ document.getElementById('managerCard').style.display='block'; loadAllAttendance(); }
+    if(role === 'Student'){ document.getElementById('studentCard').style.display='block'; loadCourses(); }
 </script>
 </body>
 </html>

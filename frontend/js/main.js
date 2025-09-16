@@ -1,9 +1,18 @@
-
-async function api(path, method='GET', data=null, token=null, isForm=false){
+async function api(path, method='GET', data=null, isForm=false){
   const opts = { method, headers: {} };
-  if(!isForm && data){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(data); }
-  if(data && isForm) opts.body = data;
+
+  if(data){
+    if(isForm){
+      opts.body = data; // FormData
+    } else {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(data);
+    }
+  }
+
+  const token = localStorage.getItem('token');
   if(token) opts.headers['Authorization'] = 'Bearer ' + token;
+
   const res = await fetch('/api' + path, opts);
   return res.json();
 }
@@ -49,3 +58,21 @@ document.getElementById('fpBtn').addEventListener('click', async ()=>{
   if(resp.error) return alert(resp.error);
   document.getElementById('fpResult').innerHTML = 'Reset token (demo): <b>' + resp.token + '</b><br/>Use it with /reset-password endpoint.';
 });
+
+// Avatar Upload (Profile Save Example)
+document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
+  const file = document.getElementById('p_avatar').files[0];
+  if(file){
+    const fd = new FormData();
+    fd.append('avatar', file);
+    const up = await api('/upload-avatar','POST', fd, true);
+    if(up.error) return alert(up.error);
+    alert('Profile updated with avatar');
+  } else {
+    alert('Profile updated without avatar');
+  }
+});
+
+
+
+
