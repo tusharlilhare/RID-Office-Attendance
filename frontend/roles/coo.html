@@ -1,4 +1,4 @@
-<!-- 
+
 <!doctype html>
 <html>
 <head>
@@ -18,17 +18,20 @@
     </div>
 
     <div class="card dashboard">
-      <div class="card small">
-        <h3>Profile</h3>
-        <div id="profileBox"></div>
-        <h4>Update Profile</h4>
-        <input id="p_name" placeholder="Name" />
-        <input id="p_email" placeholder="Email" />
-        <input id="p_phone" placeholder="Phone" />
-        <textarea id="p_bio" placeholder="Bio"></textarea>
-        <input type="file" id="p_avatar" />
-        <button id="saveProfile">Save Profile</button>
-      </div>
+     <!-- Profile Modal -->
+<div id="profileModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Update Profile</h3>
+    <input id="p_name" placeholder="Name" />
+    <input id="p_email" placeholder="Email" />
+    <input id="p_phone" placeholder="Phone" />
+    <textarea id="p_bio" placeholder="Bio"></textarea>
+    <input type="file" id="p_avatar" />
+    <button id="saveProfile">Save Profile</button>
+  </div>
+</div>
+
 
       <div class="card small">
         <h3>Mark Attendance</h3>
@@ -42,16 +45,16 @@
         <button id="markBtn">Mark</button>
       </div>
 
-      <div class="card small" id="usersCard">
+   
+    </div>
+   <div class="card small" id="usersCard">
         <h3>Team / All Users</h3>
         <button id="refreshUsers">Refresh Users</button>
         <table class="table" id="usersTable">
-          <thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Email</th><th>Action</th></tr></thead>
+          <thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Email</th><th></th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
-    </div>
-
     <div class="card" id="managerCard" style="display:none;">
       <h3>Project Manager - Admin Panel</h3>
       <button id="refreshAllAttend">Refresh All Attendance</button>
@@ -228,10 +231,35 @@
     loadUsers();
     if(role === 'Project Manager') { document.getElementById('managerCard').style.display='block'; loadAllAttendance(); }
     if(role === 'Student') { document.getElementById('studentCard').style.display='block'; loadCourses(); }
+
+
+
+
+    // Modal Elements
+const modal = document.getElementById("profileModal");
+const avatar = document.getElementById("avatarImg");
+const closeBtn = document.querySelector(".close");
+
+// Open modal when avatar clicked
+avatar.onclick = () => {
+  modal.style.display = "block";
+};
+
+// Close modal on (X)
+closeBtn.onclick = () => {
+  modal.style.display = "none";
+};
+
+// Close modal if clicked outside
+window.onclick = (e) => {
+  if (e.target == modal) {
+    modal.style.display = "none";
+  }
+};
+
 </script>
 </body>
-</html> -->
-
+</html>
 
 
 

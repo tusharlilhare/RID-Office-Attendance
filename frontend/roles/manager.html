@@ -276,17 +276,20 @@
     </div>
 
     <div class="card dashboard">
-      <div class="card small">
-        <h3>Profile</h3>
-        <div id="profileBox"></div>
-        <h4>Update Profile</h4>
-        <input id="p_name" placeholder="Name" />
-        <input id="p_email" placeholder="Email" />
-        <input id="p_phone" placeholder="Phone" />
-        <textarea id="p_bio" placeholder="Bio"></textarea>
-        <input type="file" id="p_avatar" />
-        <button id="saveProfile">Save Profile</button>
-      </div>
+    <div id="profileModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Profile</h3>
+    <div id="profileBox"></div>
+    <h4>Update Profile</h4>
+    <input id="p_name" placeholder="Name" />
+    <input id="p_email" placeholder="Email" />
+    <input id="p_phone" placeholder="Phone" />
+    <textarea id="p_bio" placeholder="Bio"></textarea>
+    <input type="file" id="p_avatar" />
+    <button id="saveProfile">Save Profile</button>
+  </div>
+</div>
 
       <div class="card small">
         <h3>Mark Attendance</h3>
@@ -300,6 +303,19 @@
         <button id="markBtn">Mark</button>
       </div>
 
+      <!-- <div class="card small" id="usersCard">
+        <h3>Team / All Users</h3>
+        <button id="refreshUsers">Refresh Users</button>
+        <table class="table" id="usersTable">
+          <thead>
+            <tr><th>Name</th><th>Role</th><th>Phone</th><th>Email</th><th>Action</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div> -->
+    </div>
+
+
       <div class="card small" id="usersCard">
         <h3>Team / All Users</h3>
         <button id="refreshUsers">Refresh Users</button>
@@ -310,7 +326,7 @@
           <tbody></tbody>
         </table>
       </div>
-    </div>
+
 
     <div class="card" id="managerCard" style="display:none;">
       <h3>Project Manager - Admin Panel</h3>
@@ -538,6 +554,30 @@
     document.getElementById('studentCard').style.display='block';
     loadCourses();
   }
+
+
+  // Modal open/close
+const modal = document.getElementById("profileModal");
+const avatar = document.getElementById("avatarImg");
+const closeBtn = document.querySelector("#profileModal .close");
+
+// Open modal jab avatar pe click kare
+avatar.onclick = () => {
+  modal.style.display = "block";
+};
+
+// Close modal jab (X) pe click kare
+closeBtn.onclick = () => {
+  modal.style.display = "none";
+};
+
+// Close modal jab bahar click kare
+window.onclick = (e) => {
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+};
+
 </script>
 </body>
 </html>

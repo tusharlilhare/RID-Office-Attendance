@@ -76,3 +76,25 @@ document.getElementById('saveProfileBtn').addEventListener('click', async ()=>{
 
 
 
+
+// Elements
+const modal = document.getElementById("profileModal");
+const avatar = document.getElementById("avatarImg"); // avatar image
+const closeBtn = document.querySelector(".close");
+
+// Open Modal (avatar click)
+avatar.onclick = () => {
+  modal.style.display = "block";
+};
+
+// Close Modal (X button)
+closeBtn.onclick = () => {
+  modal.style.display = "none";
+};
+
+// Close Modal (click outside)
+window.onclick = (e) => {
+  if (e.target == modal) {
+    modal.style.display = "none";
+  }
+};

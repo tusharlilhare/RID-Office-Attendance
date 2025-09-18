@@ -1,4 +1,4 @@
-
+<!-- 
 <!doctype html>
 <html>
 <head>
@@ -53,6 +53,284 @@
     </div>
 
   </div>
+  <script src="js/main.js"></script>
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>RID Bharat Coaching - Welcome</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg,#0f172a,#1e3a8a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      width: 100%;
+      max-width: 420px;
+      padding: 25px 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      animation: fadeIn 0.5s ease;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #1e3a8a;
+    }
+
+    .auth-toggle {
+      display: flex;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: #f1f5f9;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .auth-tab.active {
+      background: linear-gradient(to right,#2563eb,#3b82f6);
+      color: white;
+    }
+
+    .card {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card.active {
+      display: flex;
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #1e3a8a;
+    }
+
+    input, select, textarea {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+button {
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  border: none;
+  /* color: #e5e8ee; */
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Forgot Password Card */
+#forgotCard {
+  display: none; /* initially hidden */
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px 0;
+}
+
+#forgotCard h3 {
+  text-align: center;
+  color: #1e3a8a;
+  margin-bottom: 15px;
+}
+
+#forgotCard input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+#forgotCard button {
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  border: none;
+  color: #e5e8ee;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+
+#forgotCard .note {
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+}
+
+#forgotCard #fpResult {
+  font-size: 14px;
+  color: #1e3a8a;
+  text-align: center;
+  margin-top: 20px;
+}
+
+
+    .note {
+      font-size: 13px;
+      color: #555;
+      text-align: center;
+    }
+
+    .card a {
+      color: #2563eb;
+      font-size: 14px;
+      text-decoration: none;
+      text-align: right;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RID Bharat Coaching & Office Attendance</h1>
+
+    <!-- Tabs -->
+    <div class="auth-toggle">
+      <button class="auth-tab active" id="tabSignup">Sign Up</button>
+      <button class="auth-tab" id="tabLogin">Login</button>
+    </div>
+
+    <!-- Signup -->
+    <div class="card active" id="signupCard">
+      <h3>Sign up (create account)</h3>
+      <input id="su_name" placeholder="Unique username" />
+      <select id="su_role">
+        <option value="">-- Select role --</option>
+        <option>Project Manager</option>
+        <option>owner</option>
+        <option>Team Leader</option>
+        <option>Frontend Developer</option>
+        <option>Backend Developer</option>
+        <option>HR Manager</option>
+        <option>Intern</option>
+        <option>CTO</option>
+        <option>COO</option>
+        <option>Manager</option>
+        <option>Student</option>
+      </select>
+      <input id="su_email" placeholder="Email (optional)" />
+      <input id="su_phone" placeholder="Mobile number (optional)" />
+      <input id="su_password" type="password" placeholder="Password (min 6 chars)" />
+      <textarea id="su_bio" placeholder="Short bio (optional)"></textarea>
+      <button id="signupBtn">Sign up</button>
+      <p class="note">After sign-up you'll be automatically logged in and taken to your dashboard.</p>
+    </div>
+
+    <!-- Login -->
+    <div class="card" id="loginCard">
+      <h3>Login</h3>
+      <input id="name" placeholder="Your username" />
+      <input id="password" type="password" placeholder="Password" />
+      <button id="loginBtn">Login / Open Dashboard</button>
+      <p class="note">If you already signed up, use login. Otherwise register above.</p>
+      <!-- <p><a href="#" id="forgotLink">Forgot password?</a></p> -->
+    </div>
+
+    <!-- Forgot Password -->
+    <!-- <div class="card" id="forgotCard">
+      <h3>Forgot password</h3>
+      <input id="fp_name" placeholder="Username or email" />
+      <button id="fpBtn">Generate reset token (demo)</button>
+      <p class="note">Demo returns token on screen — in production you'd receive an email.</p>
+      <div id="fpResult"></div>
+    </div> -->
+  </div>
+
+  <script>
+    const tabSignup = document.getElementById("tabSignup");
+    const tabLogin = document.getElementById("tabLogin");
+    const signupCard = document.getElementById("signupCard");
+    const loginCard = document.getElementById("loginCard");
+    const forgotCard = document.getElementById("forgotCard");
+    const forgotLink = document.getElementById("forgotLink");
+
+    tabSignup.onclick = () => {
+      tabSignup.classList.add("active");
+      tabLogin.classList.remove("active");
+      signupCard.classList.add("active");
+      loginCard.classList.remove("active");
+      forgotCard.classList.remove("active");
+    };
+
+    tabLogin.onclick = () => {
+      tabLogin.classList.add("active");
+      tabSignup.classList.remove("active");
+      loginCard.classList.add("active");
+      signupCard.classList.remove("active");
+      forgotCard.classList.remove("active");
+    };
+
+    forgotLink.onclick = (e) => {
+      e.preventDefault();
+      signupCard.classList.remove("active");
+      loginCard.classList.remove("active");
+      forgotCard.classList.add("active");
+      tabSignup.classList.remove("active");
+      tabLogin.classList.remove("active");
+    };
+  </script>
+
   <script src="js/main.js"></script>
 </body>
 </html>
